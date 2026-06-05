@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="description" content="Deutsch Abenteuer - Aprende alemán jugando">
+<meta name="theme-color" content="#1a2a5a">
+<title>Deutsch Abenteuer</title>
+<link rel="stylesheet" href="styles/main.css">
+<link rel="stylesheet" href="styles/menu.css">
+<link rel="stylesheet" href="styles/ui.css">
+<link rel="stylesheet" href="styles/game.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇩🇪</text></svg>">
+</head>
+<body>
+<div id="game-container">
+  <canvas id="game" width="320" height="240"></canvas>
+  <div id="loading">
+    <h1>Deutsch Abenteuer</h1>
+    <p>Loading...</p>
+  </div>
+  <div id="ui-overlay" style="display:none">
+    <div class="dpad">
+      <div class="blank"></div>
+      <button data-key="w" aria-label="Up">▲</button>
+      <div class="blank"></div>
+      <button data-key="a" aria-label="Left">◀</button>
+      <button data-key="s" aria-label="Down">▼</button>
+      <button data-key="d" aria-label="Right">▶</button>
+    </div>
+    <div class="actions">
+      <button data-key="enter" aria-label="Action A">A</button>
+      <button data-key="escape" aria-label="Back B">B</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const l = document.getElementById('loading');
+      if (l) l.style.display = 'none';
+    }, 200);
+  });
+</script>
+</body>
+</html>

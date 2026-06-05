@@ -1,0 +1,30 @@
+{
+  "name": "deutsch-abenteuer",
+  "version": "1.0.0",
+  "description": "Educational German-learning adventure game with pixel art style",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve .",
+    "build": "echo 'No build step needed - ES6 modules load directly in browser'",
+    "test": "echo 'No tests configured yet'"
+  },
+  "keywords": [
+    "game",
+    "education",
+    "german",
+    "deutsch",
+    "pixel-art",
+    "adventure",
+    "rpg",
+    "canvas"
+  ],
+  "author": "Deutsch Abenteuer Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

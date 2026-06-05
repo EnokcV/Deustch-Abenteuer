@@ -1,0 +1,25 @@
+.menu-title {
+  color: #ffd700;
+  text-shadow: 2px 2px 0 #aa8500;
+}
+
+.menu-item {
+  color: #fff;
+  padding: 8px 16px;
+  margin: 4px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.menu-item.selected {
+  background: rgba(255, 200, 50, 0.2);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.menu-item.disabled {
+  color: #666;
+  cursor: not-allowed;
+}
