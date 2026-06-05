@@ -1,0 +1,20 @@
+{
+  "name": "Deutsch Abenteuer",
+  "short_name": "DA",
+  "description": "Aprende alemán con aventuras por Alemania",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1a1a3a",
+  "theme_color": "#1a1a3a",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "lang": "de",
+  "categories": ["education", "games"]
+}

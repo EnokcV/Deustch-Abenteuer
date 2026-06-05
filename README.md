@@ -12,38 +12,69 @@ A pixel-art educational adventure game for learning German, inspired by **Mario 
 - **Save system** with 3 slots and persistent settings
 - **Bilingual UI**: Deutsch / Español
 - **Modular ES6 architecture** — clean separation of concerns
+- **Vite build pipeline** with `public/` for static assets
+- **PWA-ready** (manifest + service-worker friendly)
 - **Mobile support** with on-screen touch controls
 
 ## Quick start
 
-The project is pure ES6 + HTML5 Canvas, no build step required.
+### Development (Vite dev server with HMR)
 
 ```bash
-# Option 1: open directly in browser (note: ES6 modules need a server)
-# Option 2: use a local server (recommended)
-npm start            # uses npx serve
-# or
-python3 -m http.server 8000
-# or
-npx http-server -p 8000
+npm install
+npm run dev          # opens http://localhost:3000
 ```
 
-Then open `http://localhost:8000` in a modern browser (Chrome, Firefox, Edge, Safari).
+### Production build
+
+```bash
+npm run build        # outputs to dist/
+npm run preview      # serve dist/ on http://localhost:4173
+```
+
+### Plain static (no build)
+
+The project also runs without a build step if you serve the folder via any HTTP server:
+
+```bash
+python3 -m http.server 8000
+# or
+npx serve .
+```
 
 ## Project structure
 
 ```
 Deutsch-Abenteuer/
 ├── index.html                  Entry HTML
-├── package.json
+├── package.json                npm scripts + Vite config
+├── vite.config.js              Vite build configuration
 ├── README.md
-├── styles/
+├── .gitignore
+│
+├── public/                     Static assets (served as-is)
+│   ├── favicon.svg
+│   ├── manifest.json           PWA manifest
+│   ├── robots.txt
+│   └── assets/
+│       ├── sprites/            Character sprite sheets (1024×1024)
+│       │   ├── characters-enoc-max.png
+│       │   └── characters-vera-cesar.png
+│       ├── audio/              (reserved for real audio files)
+│       │   ├── music/
+│       │   └── sfx/
+│       ├── worlds/             World map reference
+│       │   └── germany-map-reference.png
+│       ├── ui/                 UI assets, logos
+│       └── fonts/              (reserved for custom fonts)
+│
+├── styles/                     Global stylesheets
 │   ├── main.css                Base layout
 │   ├── menu.css                Touch controls
 │   ├── ui.css                  Menu styles
 │   └── game.css                In-game HUD styles
-├── assets/                     (for future external assets)
-└── src/
+│
+└── src/                        ES6 source code
     ├── main.js                 Bootstrap: creates Game, registers scenes
     ├── core/
     │   ├── Config.js           Constants, tile IDs, character palettes
@@ -65,7 +96,7 @@ Deutsch-Abenteuer/
     │   ├── InteractiveObject.js  Signs, benches, lamps...
     │   └── Collectible.js      Stars and pickups
     ├── graphics/
-    │   ├── SpriteGenerator.js  Procedural character sprites (Enoc/Max/Vera/César)
+    │   ├── SpriteGenerator.js  Loads real sprites from /public with procedural fallback
     │   ├── TilesetGenerator.js Procedural tile sets (ground, walls, water...)
     │   ├── WeatherSystem.js    Rain, snow, leaves particles
     │   └── ParticleSystem.js   Burst effects
@@ -122,7 +153,15 @@ The engine is designed for easy extension:
 - **New city**: add a key in `src/data/cityData.js` and a `buildXxxTown()` in `worlds/TerrainBuilder.js`.
 - **New lesson**: add a key in `src/data/vocabulary.js` and include it in `WORLD_LESSONS`.
 - **New minigame**: create a class in `src/minigames/` and wire it into `GameScene._startMiniGame()`.
-- **New character**: add an entry in `src/core/Config.js` `CHARACTERS` and the procedural `SpriteGenerator` will build idle/walk sprites automatically.
+- **New character**: add an entry in `src/core/Config.js` `CHARACTERS` and place a sprite sheet in `public/assets/sprites/`. The `SpriteGenerator` will auto-detect and use it.
+- **New audio file**: drop it in `public/assets/audio/music/` and update `AudioManager` to load via `fetch`.
+
+## `public/` vs `src/assets/`
+
+- `public/` — files are copied to the build output as-is. Use this for static assets referenced by absolute URL (e.g. `/assets/sprites/foo.png`).
+- `src/assets/` — files are imported in JS and bundled. Use this for assets you want tree-shaken or processed by Vite.
+
+In this project we use `public/` for everything (sprites, audio, manifest, favicon) so the deployed `dist/` mirrors the source structure for easy debugging.
 
 ## Audio
 
@@ -134,6 +173,17 @@ All audio is synthesized on the fly using the **Web Audio API** with oscillators
   - München: Bavarian oompah brass
   - Hamburg: sea shanty / port atmosphere
 - SFX: footsteps, dialogue blips, correct/wrong chimes, fanfare.
+
+## Deployment
+
+```bash
+npm run build      # creates dist/
+# Upload dist/ to any static host:
+#   - GitHub Pages
+#   - Netlify
+#   - Vercel
+#   - itch.io (zip dist/ and upload)
+```
 
 ## License
 

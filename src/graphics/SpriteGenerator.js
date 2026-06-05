@@ -2,17 +2,102 @@ import { CHARACTERS } from '../core/Config.js';
 
 const FRAME_W = 16;
 const FRAME_H = 24;
-const DIRS = ['down', 'up', 'left', 'right'];
+
+const SPRITE_SHEETS = {
+  enoc: 'assets/sprites/characters-enoc-max.png',
+  max: 'assets/sprites/characters-enoc-max.png',
+  vera: 'assets/sprites/characters-vera-cesar.png',
+  cesar: 'assets/sprites/characters-vera-cesar.png',
+};
+
+const SHEET_OFFSET = {
+  enoc: 0,
+  max: 1,
+  vera: 0,
+  cesar: 1,
+};
 
 export class SpriteGenerator {
   constructor() {
     this.cache = new Map();
+    this.sheetCache = new Map();
+    this.loadedSheets = new Map();
+    this.useRealSprites = true;
+    this._loadSheets();
+  }
+
+  _loadSheets() {
+    if (!this.useRealSprites) return;
+    for (const [charId, url] of Object.entries(SPRITE_SHEETS)) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        this.loadedSheets.set(url, img);
+        this.cache.delete(charId);
+        this.cache.delete('npc_' + charId);
+      };
+      img.onerror = () => {
+        console.warn('Could not load sprite sheet:', url);
+      };
+      img.src = url;
+    }
   }
 
   getSheet(characterId) {
     if (this.cache.has(characterId)) return this.cache.get(characterId);
+
     const ch = CHARACTERS.find((c) => c.id === characterId);
     if (!ch) return null;
+
+    const url = SPRITE_SHEETS[characterId];
+    const realSheet = this.loadedSheets.get(url);
+
+    if (realSheet) {
+      const canvas = this._extractFromSheet(realSheet, characterId);
+      if (canvas) {
+        this.cache.set(characterId, canvas);
+        return canvas;
+      }
+    }
+
+    const canvas = this._generateProcedural(ch);
+    this.cache.set(characterId, canvas);
+    return canvas;
+  }
+
+  _extractFromSheet(sheetImg, characterId) {
+    const canvas = document.createElement('canvas');
+    canvas.width = FRAME_W * 4 * 4;
+    canvas.height = FRAME_H * 4;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    const offset = SHEET_OFFSET[characterId];
+    if (offset === undefined) return null;
+
+    const sourceW = sheetImg.width;
+    const sourceH = sheetImg.height;
+    const portraitW = sourceW / 2;
+    const portraitH = sourceH / 2;
+
+    const col = offset % 2;
+    const row = Math.floor(offset / 2);
+    const srcX = col * portraitW;
+    const srcY = row * portraitH + 0;
+
+    try {
+      ctx.drawImage(
+        sheetImg,
+        srcX, srcY + 30, portraitW, portraitH - 30,
+        0, 0, canvas.width, canvas.height
+      );
+    } catch (e) {
+      return null;
+    }
+    return canvas;
+  }
+
+  _generateProcedural(ch) {
     const canvas = document.createElement('canvas');
     canvas.width = FRAME_W * 4 * 4;
     canvas.height = FRAME_H * 4;
@@ -33,7 +118,6 @@ export class SpriteGenerator {
       this._drawWalk(ctx, d * FRAME_W * 4 + FRAME_W * 2, FRAME_H * 3, ch, d, 2);
       this._drawWalk(ctx, d * FRAME_W * 4 + FRAME_W * 3, FRAME_H * 3, ch, d, 3);
     }
-    this.cache.set(characterId, canvas);
     return canvas;
   }
 
@@ -48,22 +132,13 @@ export class SpriteGenerator {
     return canvas;
   }
 
-  _px(ctx, x, y, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, 1, 1);
-  }
-
-  _rect(ctx, x, y, w, h, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, w, h);
-  }
+  _px(ctx, x, y, color) { ctx.fillStyle = color; ctx.fillRect(x, y, 1, 1); }
+  _rect(ctx, x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(x, y, w, h); }
 
   _drawIdle(ctx, ox, oy, ch, dir) {
     const p = ch.palette;
     const isVera = ch.id === 'vera';
     const skin = p.skin;
-    const skinShade = this._shade(p.skin, -0.15);
-
     if (isVera) {
       this._rect(ctx, ox + 4, oy + 1, 8, 3, p.hat);
       this._rect(ctx, ox + 3, oy + 3, 10, 2, p.hat);
@@ -72,7 +147,6 @@ export class SpriteGenerator {
       this._rect(ctx, ox + 4, oy + 1, 8, 5, p.hair);
       this._rect(ctx, ox + 5, oy + 6, 6, 1, p.hairShadow);
     }
-
     if (dir === 0 || dir === 2 || dir === 3) {
       this._rect(ctx, ox + 5, oy + 6, 6, 5, skin);
       this._rect(ctx, ox + 5, oy + 9, 2, 1, '#000');
@@ -81,7 +155,6 @@ export class SpriteGenerator {
       this._rect(ctx, ox + 5, oy + 6, 6, 4, p.hair);
       this._rect(ctx, ox + 5, oy + 10, 6, 1, p.hairShadow);
     }
-
     this._rect(ctx, ox + 3, oy + 11, 10, 7, p.shirt);
     this._rect(ctx, ox + 3, oy + 14, 10, 1, p.shirtShadow);
     if (isVera) {
@@ -92,12 +165,10 @@ export class SpriteGenerator {
     } else {
       this._rect(ctx, ox + 7, oy + 11, 2, 1, p.accent);
     }
-
     this._rect(ctx, ox + 4, oy + 18, 3, 4, p.pants);
     this._rect(ctx, ox + 9, oy + 18, 3, 4, p.pants);
     this._rect(ctx, ox + 4, oy + 21, 1, 1, p.pantsShadow);
     this._rect(ctx, ox + 9, oy + 21, 1, 1, p.pantsShadow);
-
     this._rect(ctx, ox + 3, oy + 22, 4, 2, p.shoes);
     this._rect(ctx, ox + 9, oy + 22, 4, 2, p.shoes);
     this._rect(ctx, ox + 3, oy + 23, 4, 1, p.shoesShadow);
@@ -109,8 +180,6 @@ export class SpriteGenerator {
     const isVera = ch.id === 'vera';
     const skin = p.skin;
     const legOffset = (frame === 1) ? -1 : (frame === 3 ? 1 : 0);
-    const armOffset = (frame === 1) ? -1 : (frame === 3 ? 1 : 0);
-
     if (isVera) {
       this._rect(ctx, ox + 4, oy + 1, 8, 3, p.hat);
       this._rect(ctx, ox + 3, oy + 3, 10, 2, p.hat);
@@ -119,7 +188,6 @@ export class SpriteGenerator {
       this._rect(ctx, ox + 4, oy + 1, 8, 5, p.hair);
       this._rect(ctx, ox + 5, oy + 6, 6, 1, p.hairShadow);
     }
-
     if (dir === 0 || dir === 2 || dir === 3) {
       this._rect(ctx, ox + 5, oy + 6, 6, 5, skin);
       this._rect(ctx, ox + 5, oy + 9, 2, 1, '#000');
@@ -128,15 +196,12 @@ export class SpriteGenerator {
       this._rect(ctx, ox + 5, oy + 6, 6, 4, p.hair);
       this._rect(ctx, ox + 5, oy + 10, 6, 1, p.hairShadow);
     }
-
     this._rect(ctx, ox + 3, oy + 11, 10, 7, p.shirt);
     this._rect(ctx, ox + 3, oy + 14, 10, 1, p.shirtShadow);
-
     const lLegY = oy + 18 + (legOffset < 0 ? 1 : 0);
     const rLegY = oy + 18 + (legOffset > 0 ? 1 : 0);
     this._rect(ctx, ox + 4, lLegY, 3, 4, p.pants);
     this._rect(ctx, ox + 9, rLegY, 3, 4, p.pants);
-
     this._rect(ctx, ox + 3, oy + 22, 4, 2, p.shoes);
     this._rect(ctx, ox + 9, oy + 22, 4, 2, p.shoes);
     this._rect(ctx, ox + 3, oy + 23, 4, 1, p.shoesShadow);
@@ -165,14 +230,5 @@ export class SpriteGenerator {
     this._rect(ctx, ox + 9, oy + 18, 3, 4, p.pants);
     this._rect(ctx, ox + 3, oy + 22, 4, 2, p.shoes);
     this._rect(ctx, ox + 9, oy + 22, 4, 2, p.shoes);
-  }
-
-  _shade(hex, pct) {
-    const num = parseInt(hex.slice(1), 16);
-    const r = (num >> 16) & 0xff;
-    const g = (num >> 8) & 0xff;
-    const b = num & 0xff;
-    const f = (v) => Math.max(0, Math.min(255, Math.floor(v + (pct < 0 ? v * pct : (255 - v) * pct))));
-    return '#' + ((f(r) << 16) | (f(g) << 8) | f(b)).toString(16).padStart(6, '0');
   }
 }
