@@ -1,0 +1,13 @@
+{
+  "name": "jsdom",
+  "version": "1.0.0-stub",
+  "description": "Empty stub for jsdom to avoid pulling deprecated whatwg-encoding@3.1.1. The game tests use the 'node' environment in vitest and never import jsdom.",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./lib/jsdom/living/interfaces.js": "./empty.js",
+    "./lib/jsdom/living/xhr/xhr-utils.js": "./empty.js",
+    "./lib/jsdom/browser/Window.js": "./empty.js",
+    "./lib/jsdom/living/dom-parser.js": "./empty.js"
+  }
+}

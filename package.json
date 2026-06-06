@@ -26,11 +26,10 @@
   ],
   "author": "Deutsch Abenteuer Team",
   "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
+  "overrides": {
+    "jsdom": "file:./stubs/jsdom-stub"
   },
   "devDependencies": {
-    "jsdom": "^27.0.1",
     "vite": "^5.4.0",
     "vitest": "^2.1.9"
   }

@@ -40,3 +40,6 @@ coverage/
 
 # Large docs/prompts (no se despliegan)
 docs/berlin-overhaul-prompt.md
+
+# Stubs (sólo se usan en install local, no en runtime)
+stubs/
