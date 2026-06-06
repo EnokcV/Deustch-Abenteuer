@@ -14,6 +14,7 @@ export class PauseScene {
   exit() {}
 
   update(dt) {
+    try {
     if (this.game.input.wasPressed('w') || this.game.input.wasPressed('arrowup')) {
       this.selected = (this.selected - 1 + 3) % 3;
       this.game.audio.playSFX('blip');
@@ -41,6 +42,9 @@ export class PauseScene {
         this.game.audio.playErika();
         this.game.scenes.switchTo('menu');
       }
+    }
+    } catch (e) {
+      console.error('[Pause] Error en update():', e);
     }
   }
 

@@ -11,6 +11,7 @@ export class OptionsScene {
   exit() {}
 
   update(dt) {
+    try {
     if (this.game.input.wasPressed('w') || this.game.input.wasPressed('arrowup')) {
       this.selected = (this.selected - 1 + 4) % 4;
       this.game.audio.playSFX('blip');
@@ -28,6 +29,9 @@ export class OptionsScene {
     if (this.game.input.wasPressed('escape')) {
       this.game.audio.playSFX('select');
       this.game.scenes.switchTo('menu');
+    }
+    } catch (e) {
+      console.error('[Options] Error en update():', e);
     }
   }
 

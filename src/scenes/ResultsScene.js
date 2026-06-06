@@ -15,9 +15,13 @@ export class ResultsScene {
   exit() {}
 
   update(dt) {
+    try {
     if (this.game.input.wasPressed('enter') || this.game.input.wasPressed('escape')) {
       this.game.audio.playSFX('select');
       this.game.scenes.switchTo(this.nextScene, this.nextParams);
+    }
+    } catch (e) {
+      console.error('[Results] Error en update():', e);
     }
   }
 

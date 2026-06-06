@@ -42,12 +42,24 @@ export class Engine {
     this.lastTime = now;
     this.accumulator += delta;
     while (this.accumulator >= this.fixedDt) {
-      if (this.game && this.game.update) this.game.update(this.fixedDt / 1000);
+      if (this.game && this.game.update) {
+        try {
+          this.game.update(this.fixedDt / 1000);
+        } catch (e) {
+          console.error('[Engine] Excepción en update():', e);
+        }
+      }
       this.accumulator -= this.fixedDt;
     }
     this.ctx.fillStyle = '#000';
     this.ctx.fillRect(0, 0, this.W, this.H);
-    if (this.game && this.game.render) this.game.render(this.ctx);
+    if (this.game && this.game.render) {
+      try {
+        this.game.render(this.ctx);
+      } catch (e) {
+        console.error('[Engine] Excepción en render():', e);
+      }
+    }
     requestAnimationFrame(this._loop);
   }
 }
