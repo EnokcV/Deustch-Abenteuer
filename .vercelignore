@@ -1,0 +1,42 @@
+# Tests
+tests/
+vitest.config.js
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sprites raw (no se despliegan)
+sprites_extraidos/
+sprites_individuales(1)/
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+.next/
+.nuxt/
+
+# Coverage
+coverage/
+*.lcov
+
+# Large docs/prompts (no se despliegan)
+docs/berlin-overhaul-prompt.md

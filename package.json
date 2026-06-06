@@ -27,7 +27,7 @@
   "author": "Deutsch Abenteuer Team",
   "license": "MIT",
   "engines": {
-    "node": ">=14"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "jsdom": "^27.0.1",
